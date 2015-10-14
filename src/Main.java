@@ -111,7 +111,7 @@ public class Main implements IEventObserver {
 
         for (int i = 2; i < args.length; i++) {
             parser.parse(args[i]);
-            terrains.put(args[i], parser.build());
+            terrains.put(args[i], parser.build(window.getSize()));
         }
 
         activeTerrain = args[2];
@@ -149,6 +149,7 @@ public class Main implements IEventObserver {
             return;
         }
 
+        gui.drawText("Tessellation factor: " + terrainSampling, 32, window.getSize().y - 72, false);
         gui.drawText("Name : " + activeTerrain, 32, window.getSize().y - 48, false);
         terrain = terrains.get(activeTerrain);
         if (terrain == null)

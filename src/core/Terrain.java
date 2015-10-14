@@ -3,8 +3,8 @@ package core;
 import gui.SFMLGUI;
 import org.javatuples.Pair;
 import org.jsfml.graphics.Color;
-import org.jsfml.graphics.RenderWindow;
 import org.jsfml.system.Vector2f;
+import org.jsfml.system.Vector2i;
 
 import java.util.List;
 
@@ -18,11 +18,15 @@ public class Terrain {
 
     private final List<String> lines;
 
+    private Vector2i windowSize;
+
     private float projectionX = 0.6f;
     private float projectionY = 0.6f;
 
     private float scaleXY = 25.0f;
     private float scaleZ = 5.0f;
+
+    private int sampling = 1;
 
     public Terrain(final List<String> lines) {
         if (lines == null || lines.isEmpty() || lines.get(0).isEmpty()) {
@@ -31,6 +35,15 @@ public class Terrain {
         this.width = lines.get(0).split(" ").length;
         this.height = lines.size();
         this.lines = lines;
+    }
+
+    public Terrain build(final Vector2i windowSize) {
+        this.windowSize = windowSize;
+
+        buildData();
+        buildProjectionData();
+
+        return this;
     }
 
     /**
@@ -53,11 +66,13 @@ public class Terrain {
      * Create a 2D matrix from 3D matrix with isometric projection.
      */
     public void buildProjectionData() {
-        int x;
+        int x, bound;
+
+        bound = (sampling == 1) ? 0 : sampling;
 
         projectionData = new Pair[height][width];
-        for (int y = 0; y < height; y++)
-            for (x = 0; x < width; x++)
+        for (int y = 0; y < height - bound; y += sampling)
+            for (x = 0; x < width - bound; x += sampling)
                 projectionData[y][x] = projectData((float)x, (float)y, (float)data[y][x]);
     }
 
@@ -75,15 +90,15 @@ public class Terrain {
         buildProjectionData();
     }
 
-    public void draw(SFMLGUI gui, final int sample) {
+    public void draw(SFMLGUI gui, final int sampling) {
         Vector2f a, b, c, d;
         int x;
         int step;
 
-        step = (sample == 0) ? 1 : sample;
+        step = (sampling == 0) ? 1 : sampling;
 
-        for (int y = 0; y < height - sample; y += sample) {
-            for (x = 0; x < width - sample; x += sample) {
+        for (int y = 0; y < height - sampling; y += sampling) {
+            for (x = 0; x < width - sampling; x += sampling) {
                 a = new Vector2f((float)projectionData[y][x].getValue0(), (float)projectionData[y][x].getValue1());
                 b = new Vector2f((float)projectionData[y][x + step].getValue0(), (float)projectionData[y][x + step].getValue1());
                 c = new Vector2f((float)projectionData[y + step][x + step].getValue0(), (float)projectionData[y + step][x + step].getValue1());

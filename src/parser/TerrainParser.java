@@ -1,6 +1,7 @@
 package parser;
 
 import core.Terrain;
+import org.jsfml.system.Vector2i;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,13 +52,10 @@ public class TerrainParser {
      * Create a Terrain class with 3D and 2D matrices build.
      * @return new Terrain pre-build
      */
-    public Terrain build() {
+    public Terrain build(final Vector2i windowSize) {
         Terrain terrain = new Terrain(lines);
 
-        terrain.buildData();
-        terrain.buildProjectionData();
-
-        return terrain;
+        return terrain.build(windowSize);
     }
 
     private final List<String> getLines(final String filename) throws RuntimeException {
